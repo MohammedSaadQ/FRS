@@ -24,3 +24,19 @@ EXPOSE 8080
 
 # Set the command to run the Python application
 CMD ["python", "main.py"]
+
+# fix issues in images
+FROM debian:bullseye
+
+RUN apt-get update && \
+    apt-get install -y \
+    libssl3=3.0.13-1~deb12u1 \
+    openssl=3.0.13-1~deb12u1 \
+    libgnutls30=3.7.9-2+deb12u3 \
+    libudev1=252.23-1~deb12u1 \
+    libsystemd0=252.23-1~deb12u1 \
+    libkrb5-3=1.20.1-2+deb12u2 \
+    libkrb5support0=1.20.1-2+deb12u2 \
+    libgssapi-krb5-2=1.20.1-2+deb12u2 \
+    libk5crypto3=1.20.1-2+deb12u2
+
