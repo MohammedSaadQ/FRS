@@ -26,7 +26,7 @@ EXPOSE 8080
 CMD ["python", "main.py"]
 
 # fix issues in images
-F# Use the official Debian Bullseye image as the base
+# Use the official Debian Bullseye image as the base
 FROM debian:bullseye
 
 # Update package list and install the specific versions of packages
