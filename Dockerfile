@@ -26,8 +26,10 @@ EXPOSE 8080
 CMD ["python", "main.py"]
 
 # fix issues in images
+F# Use the official Debian Bullseye image as the base
 FROM debian:bullseye
 
+# Update package list and install the specific versions of packages
 RUN apt-get update && \
     apt-get install -y \
     libssl3=3.0.13-1~deb12u1 \
@@ -38,5 +40,8 @@ RUN apt-get update && \
     libkrb5-3=1.20.1-2+deb12u2 \
     libkrb5support0=1.20.1-2+deb12u2 \
     libgssapi-krb5-2=1.20.1-2+deb12u2 \
-    libk5crypto3=1.20.1-2+deb12u2
+    libk5crypto3=1.20.1-2+deb12u2 && \
+    apt-get clean && \
+    rm -rf /var/lib/apt/lists/*
+
 
