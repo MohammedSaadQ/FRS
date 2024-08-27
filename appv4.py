@@ -125,10 +125,11 @@ def recommendation():
 
         # Parse the response
         answer = response_scoring.json()["predictions"][0]["values"][1]
+        return jsonify({"recommendation": answer}), 200 
         
 
         # Return the response as JSON
-        return jsonify(answer), 200
+        #return jsonify(answer), 200
 
     except Exception as e:
         logger.error(f"An error occurred in the recommendation function: {str(e)}")
