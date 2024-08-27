@@ -83,6 +83,7 @@ def get_customer_data():
         return jsonify({"error": f"An error occurred: {str(e)}"}), 500
 
 def get_ibm_token():
+    API_KEY = "tAqvF4CdCAl9Ly4TrNECn-p1t_KyCHqbrYa_XXUQldul"
     token_response = requests.post(
         'https://iam.cloud.ibm.com/identity/token',
         data={"apikey": API_KEY, "grant_type": 'urn:ibm:params:oauth:grant-type:apikey'}
@@ -124,9 +125,10 @@ def recommendation():
 
         # Parse the response
         answer = response_scoring.json()["predictions"][0]["values"][1]
+        Answer = { "recommendation": answer }
 
         # Return the response as JSON
-        return jsonify(answer), 200
+        return jsonify(Answer), 200
 
     except Exception as e:
         logger.error(f"An error occurred in the recommendation function: {str(e)}")
