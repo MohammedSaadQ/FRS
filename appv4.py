@@ -123,7 +123,7 @@ def recommendation():
         )
 
         # Parse the response
-        answer = response_scoring.json()
+        answer = response_scoring.json()["predictions"][0]["values"][1]
 
         # Return the response as JSON
         return jsonify(answer), 200
@@ -171,7 +171,7 @@ def matching():
         )
 
         # Parse the response
-        answer = response_scoring.json()
+        answer = response_scoring.json()["predictions"][0]["values"][1]
 
         # Return the response as JSON
         return jsonify(answer), 200
