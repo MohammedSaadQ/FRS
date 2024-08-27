@@ -128,7 +128,7 @@ def recommendation():
         Answer = {"recommendation": answer }
 
         # Return the response as JSON
-        return jsonify(Answer), 200
+        return Answer, 200
 
     except Exception as e:
         logger.error(f"An error occurred in the recommendation function: {str(e)}")
