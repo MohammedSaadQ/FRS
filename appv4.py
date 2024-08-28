@@ -26,18 +26,7 @@ logger.addHandler(console_handler)
 # Function to set variables based on the retrieved customer data and return as a dictionary
 def set_variables_from_data(customer_data):
     if isinstance(customer_data, dict):
-        return {
-            "Ingredients": str(customer_data.get("Ingredients", "")),
-            "allergy": str(customer_data.get("allergy", "")),
-            "budget": str(customer_data.get("budget", "")),
-            "calories": str(customer_data.get("calories", "")),
-            "customerid": str(customer_data.get("customerid", "")),
-            "dislikes": str(customer_data.get("dislikes", "")),
-            "location": str(customer_data.get("location", "")),
-            "preferences": str(customer_data.get("preferences", ""))
-        }
-    else:
-        logger.error("Data is not in the expected format.")
+ ected format.")
         return None
 
 # Define the API endpoint
