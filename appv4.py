@@ -124,8 +124,8 @@ def recommendation():
         )
 
         # Parse the response
-        answer = response_scoring.json()
-        return jsonify(Answer), 200 
+        answer = response_scoring.json()["predictions"][0]["values"][1]
+        return jsonify({"recommendation": str(answer)})
         
 
         # Return the response as JSON
