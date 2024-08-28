@@ -93,49 +93,10 @@ def get_ibm_token():
 # Recommendation function
 @app.route('/recommendation', methods=['POST'])
 def recommendation():
-    try:
-        # Get the IBM Cloud OAuth token
-        mltoken = get_ibm_token()
+    return "Hi"
 
-        # Construct the question
-        question = "Please find and recommend for customer with ID 3 and give the three best dishes."
 
-        # Prepare the messages payload
-        messages = [{"role": "user", "content": question}]
-
-        # Prepare the header
-        header = {'Content-Type': 'application/json', 'Authorization': 'Bearer ' + mltoken}
-
-        # Prepare the payload
-        payload_scoring = {
-            "input_data": [
-                {
-                    "fields": ["Search", "access_token"],
-                    "values": [messages, [mltoken]]
-                }
-            ]
-        }
-
-        # Make the request to the Watson ML model deployment
-        response_scoring = requests.post(
-            'https://us-south.ml.cloud.ibm.com/ml/v4/deployments/208d9263-7bf6-4fc2-85c7-3618309a83fd/predictions?version=2021-05-01',
-            json=payload_scoring,
-            headers=header
-        )
-
-        # Parse the response
-        answer = response_scoring.json()["predictions"][0]["values"][1]
-        return jsonify({"recommendation": str(answer)})
-        
-
-        # Return the response as JSON
-        #return jsonify(answer), 200
-
-    except Exception as e:
-        logger.error(f"An error occurred in the recommendation function: {str(e)}")
-        return jsonify({"error": str(e)}), 500
-
-# Matching function
+# Matching function 
 @app.route('/matching', methods=['POST'])
 def matching():
     try:
