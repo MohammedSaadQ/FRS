@@ -118,7 +118,7 @@ def recommendation():
 
         # Make the request to the Watson ML model deployment
         response_scoring = requests.post(
-            'https://us-south.ml.cloud.ibm.com/ml/v4/deployments/596b54cb-e804-4b0e-9801-5ceea719b5d6/predictions?version=2021-05-01',
+            'https://private.us-south.ml.cloud.ibm.com/ml/v4/deployments/208d9263-7bf6-4fc2-85c7-3618309a83fd/predictions?version=2021-05-01',
             json=payload_scoring,
             headers=header
         )
