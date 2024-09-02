@@ -24,5 +24,5 @@ EXPOSE 8080
 
 # Set the command to run the Python application
 #CMD ["python", "main.py"]
-CMD ["python", "appv5.py"]
+CMD ["python", "appv4.py"]
 #CMD ["python", "New.py"]
