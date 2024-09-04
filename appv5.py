@@ -82,16 +82,12 @@ def recommendation():
     try:
         # Get the IBM Cloud OAuth token
         mltoken = get_ibm_token()
-
         # Construct the question
         question = "recommend 3 dishes for customer with ID = 1 that share the same location as the customer (Riyadh) and do not recommend dishes that share ingredients with the customer's dislikes and allergies. recommend dishes that share ingredients with the customer's preferences. recommend dishes whose calories do not exceed the customer's calorie limit. recommend dishes whose price is less than or equal to the customer's budget. only respond with the dish id and name and restaurant name and calories of dish and price of dish"
-
         # Prepare the messages payload
         messages = [{"role": "user", "content": question}]
-
         # Prepare the header
         header = {'Content-Type': 'application/json', 'Authorization': 'Bearer ' + mltoken}
-
         # Prepare the payload
         payload_scoring = {
             "input_data": [
@@ -101,56 +97,52 @@ def recommendation():
                 }
             ]
         }
-
         # Make the request to the Watson ML model deployment
         response_scoring = requests.post(
             'https://us-south.ml.cloud.ibm.com/ml/v4/deployments/596b54cb-e804-4b0e-9801-5ceea719b5d6/predictions?version=2021-05-01',
             json=payload_scoring,
             headers=header
         )
-
         # Parse the response
         response_json = response_scoring.json()
         if "predictions" in response_json and len(response_json["predictions"]) > 0:
             prediction = response_json["predictions"][0]
-            
-            # Check if "values" contain valid data
             if "values" in prediction and len(prediction["values"]) > 1:
                 recommendations_text = prediction["values"][1]
-                recommendations_list = recommendations_text.split("\n\n")[1:]  # Split by double new lines
-
+                recommendations_list = recommendations_text.split("\n\n")[1:]  # Splitting based on double new lines to separate the items
+                # Ensure we only take the first three recommendations
+                first_three_recommendations = recommendations_list
                 # Format each recommendation as a separate response
                 responses = []
-                for item in recommendations_list:
-                    response = {"text": item.strip()}
+                for item in first_three_recommendations:
+                    response = {
+                        "text": item.strip()
+                    }
                     responses.append(response)
-
-                # Initialize the list for cleaned recommendations
-                cleaned_recommendations = []
-
-                # Iterate over the responses and extract the recommendation details
-                for item in responses:
-                    # Extract the recommendation details
+                    
+                    
+                # Return the three separate responses in sequence
+                input_str = {"responses": responses}
+                cleaned_recommendations = {}
+                for item in input_str['responses']:
+        # Extract the recommendation details
                     details = item['text'].replace("### Recommendation ", "").replace("\n* ", ", ").split(', ')
-
-                    # Ensure all necessary details are present
-                    if len(details) >= 6:
-                        recommendation = {
-                            "Recommendation": int(details[0]),
-                            "Dish ID": int(details[1].split(": ")[1]),
-                            "Dish Name": details[2].split(": ")[1],
-                            "Restaurant Name": details[3].split(": ")[1],
-                            "Calories": int(details[4].split(": ")[1]),
-                            "Price": int(details[5].split(": ")[1])
-                        }
-
-                        # Append the recommendation to the list
-                        cleaned_recommendations.append(recommendation)
-                cleaned_recommendations = {"Recommendations" : cleaned_recommendations}
-                # Return the cleaned list of recommendations
-                return jsonify(cleaned_recommendations), 200
-
-
+        # Create a dictionary for the recommendation
+                    recommendation = {
+                        "Dish ID": int(details[1].split(": ")[1]),
+                        "Dish Name": details[2].split(": ")[1],
+                        "Restaurant Name": details[3].split(": ")[1],
+                        "Calories": int(details[4].split(": ")[1]),
+                        "Price": int(details[5].split(": ")[1])
+        }
+        # Use the recommendation number as the key
+                    recommendation_number = f"Recommendation {int(details[0])}"
+                    cleaned_recommendations[recommendation_number] = recommendation
+    # Convert the dictionary to a pretty JSON string
+                    output_json = json.dumps(cleaned_recommendations, indent=4)
+                
+                return jsonify(output_json), 200 
+        
         # Return the response as JSON
         #return jsonify(answer), 200
     except Exception as e:
