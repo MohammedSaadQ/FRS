@@ -138,7 +138,7 @@ def recommendation():
                         # Append the recommendation to the list
                         cleaned_recommendations.append(recommendation)
 
-                cleaned_recommendations = {"Recommendations" : cleaned_recommendations}
+                #cleaned_recommendations = {"Recommendations" : cleaned_recommendations}
                 # Return the cleaned list of recommendations
                 return jsonify(cleaned_recommendations), 200
 
