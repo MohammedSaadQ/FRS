@@ -113,49 +113,42 @@ def recommendation():
         response_json = response_scoring.json()
         if "predictions" in response_json and len(response_json["predictions"]) > 0:
             prediction = response_json["predictions"][0]
+            
+            # Check if "values" contain valid data
             if "values" in prediction and len(prediction["values"]) > 1:
                 recommendations_text = prediction["values"][1]
-                recommendations_list = recommendations_text.split("\n\n")[1:]  # Splitting based on double new lines to separate the items
-
-                # Ensure we only take the first three recommendations
-                first_three_recommendations = recommendations_list
+                recommendations_list = recommendations_text.split("\n\n")[1:]  # Split by double new lines
 
                 # Format each recommendation as a separate response
                 responses = []
-                for item in first_three_recommendations:
-                    response = {
-                        "text": item.strip()
-                    }
+                for item in recommendations_list:
+                    response = {"text": item.strip()}
                     responses.append(response)
-                    
-                    
 
-                # Return the three separate responses in sequence
-                input_str = {"responses": responses}
-                cleaned_recommendations = {}
+                # Initialize the list for cleaned recommendations
+                cleaned_recommendations = []
 
-                for item in input_str['responses']:
-        # Extract the recommendation details
+                # Iterate over the responses and extract the recommendation details
+                for item in responses:
+                    # Extract the recommendation details
                     details = item['text'].replace("### Recommendation ", "").replace("\n* ", ", ").split(', ')
 
-        # Create a dictionary for the recommendation
-                    recommendation = {
-                        "Dish ID": int(details[1].split(": ")[1]),
-                        "Dish Name": details[2].split(": ")[1],
-                        "Restaurant Name": details[3].split(": ")[1],
-                        "Calories": int(details[4].split(": ")[1]),
-                        "Price": int(details[5].split(": ")[1])
-        }
+                    # Ensure all necessary details are present
+                    if len(details) >= 6:
+                        recommendation = {
+                            "Recommendation": int(details[0]),
+                            "Dish ID": int(details[1].split(": ")[1]),
+                            "Dish Name": details[2].split(": ")[1],
+                            "Restaurant Name": details[3].split(": ")[1],
+                            "Calories": int(details[4].split(": ")[1]),
+                            "Price": int(details[5].split(": ")[1])
+                        }
 
-        # Use the recommendation number as the key
-                    recommendation_number = f"Recommendation {int(details[0])}"
-                    cleaned_recommendations[recommendation_number] = recommendation
+                        # Append the recommendation to the list
+                        cleaned_recommendations.append(recommendation)
 
-    # Convert the dictionary to a pretty JSON string
-                    output_json = json.dumps(cleaned_recommendations, indent=4)
-                
-                return jsonify(output_json), 200 
-        
+                # Return the cleaned list of recommendations
+                return jsonify(cleaned_recommendations), 200
 
 
         # Return the response as JSON
