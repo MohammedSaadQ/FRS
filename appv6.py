@@ -140,7 +140,8 @@ def recommendation():
 
                 #cleaned_recommendations = {"Recommendations" : cleaned_recommendations}
                 # Return the cleaned list of recommendations
-                return jsonify(cleaned_recommendations), 200
+                # return jsonify(cleaned_recommendations), 200
+                return jsonify({cleaned_recommendations}), 200
 
         # Return the response as JSON
         #return jsonify(answer), 200
