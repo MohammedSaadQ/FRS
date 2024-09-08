@@ -82,7 +82,7 @@ def recommendation():
     try:
         params = request.json
         customer_id = 1
-        loc = params.get("location")
+        loc = "Riyadh"
         # Get the IBM Cloud OAuth token
         mltoken = get_ibm_token()
         # Construct the question
