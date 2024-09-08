@@ -80,8 +80,8 @@ def get_ibm_token():
 @app.route('/recommendation', methods=['POST'])
 def recommendation():
     try:
-        params = request.json
-        customer_id = params.get("id")
+        #params = request.json
+        customer_id = 1
         #  loc = params.get("location")
         # Get the IBM Cloud OAuth token
         mltoken = get_ibm_token()
