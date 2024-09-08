@@ -184,6 +184,7 @@ def matching():
         # Parse the response
         answer = response_scoring.json()["predictions"][0]["values"][1]
         # Return the response as JSON
+        answer = {"matchResult": answer}
         return jsonify(answer), 200
     except Exception as e:
         logger.error(f"An error occurred in the matching function: {str(e)}")
