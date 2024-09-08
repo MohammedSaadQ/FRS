@@ -81,12 +81,12 @@ def get_ibm_token():
 def recommendation():
     try:
         params = request.json
-        customer_id = 1
-        loc = "Riyadh"
+        customer_id = params.get("id")
+        loc = params.get("location")
         # Get the IBM Cloud OAuth token
         mltoken = get_ibm_token()
         # Construct the question
-        question = "recommend 3 dishes for customer with ID = 1 that share the same location as the customer ({loc}) and do not recommend dishes that share ingredients with the customer's dislikes and allergies. recommend dishes that share ingredients with the customer's preferences. recommend dishes whose calories do not exceed the customer's calorie limit. recommend dishes whose price is less than or equal to the customer's budget. only respond with the dish id and name and restaurant name and calories of dish and price of dish"
+        question = f"recommend 3 dishes for customer with ID = {customer_id} that share the same location as the customer ({loc}) and do not recommend dishes that share ingredients with the customer's dislikes and allergies. recommend dishes that share ingredients with the customer's preferences. recommend dishes whose calories do not exceed the customer's calorie limit. recommend dishes whose price is less than or equal to the customer's budget. only respond with the dish id and name and restaurant name and calories of dish and price of dish"
         # Prepare the messages payload
         messages = [{"role": "user", "content": question}]
         # Prepare the header
