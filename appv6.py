@@ -26,7 +26,7 @@ def set_variables_from_data(customer_data):
             "allergy": str(customer_data.get("allergy", "")),
             "budget": str(customer_data.get("budget", "")),
             "calories": str(customer_data.get("calories", "")),
-            "customerid": str(customer_data.get("customer_id", "")),  # Updated key based on the response
+            "customer_id": str(customer_data.get("customer_id", "")),  # Updated key based on the response
             "dislikes": str(customer_data.get("dislikes", "")),
             "first_name": str(customer_data.get("first_name", "")),
             "last_name": str(customer_data.get("last_name", "")),
