@@ -84,79 +84,82 @@ def recommendation():
         customer_id = "5"
         loc = "Jeddah"
         pref = "Steak,Sushi,Italian"
+    
         # Get the IBM Cloud OAuth token
         mltoken = get_ibm_token()
+    
         # Construct the question
         question = f"recommend 3 dishes for customer with ID = {customer_id} that share the same location as the customer ({loc}) and do not recommend dishes that share ingredients with the customer's dislikes and allergies. recommend dishes that share ingredients with the customer's preferences. recommend dishes whose calories do not exceed the customer's calorie limit. recommend dishes whose price is less than or equal to the customer's budget. Please note customer {customer_id} prefers {pref}. make well-rounded suggestions. only respond with the Recommendation number, dish name and restaurant name and calories for the dish and the budget for the dish."
+    
         # Prepare the messages payload
         messages = [{"role": "user", "content": question}]
+    
         # Prepare the header
         header = {'Content-Type': 'application/json', 'Authorization': 'Bearer ' + mltoken}
+    
         # Prepare the payload
         payload_scoring = {
             "input_data": [
-                {
-                    "fields": ["Search", "access_token"],
-                    "values": [messages, [mltoken]]
+            {
+                "fields": ["Search", "access_token"],
+                "values": [messages, [mltoken]]
+                        }
+                    ]
                 }
-            ]
-        }
+        
         # Make the request to the Watson ML model deployment
         response_scoring = requests.post(
-            'https://us-south.ml.cloud.ibm.com/ml/v4/deployments/af66b1fa-ad2b-489d-b127-f33556fce10b/predictions?version=2021-05-01',
+        'https://us-south.ml.cloud.ibm.com/ml/v4/deployments/af66b1fa-ad2b-489d-b127-f33556fce10b/predictions?version=2021-05-01',
             json=payload_scoring,
             headers=header
-        )
+    )
+    
         # Parse the response
         response_json = response_scoring.json()
-    if "predictions" in response_json and len(response_json["predictions"]) > 0:
-        prediction = response_json["predictions"][0]
+        if "predictions" in response_json and len(response_json["predictions"]) > 0:
+            prediction = response_json["predictions"][0]
 
     # Check if "values" contain valid data
-    if "values" in prediction and len(prediction["values"]) > 1:
-        recommendations_text = prediction["values"][1]
-        recommendations_list = recommendations_text.split("\n\n")  # Split by double new lines
+        if "values" in prediction and len(prediction["values"]) > 1:
+            recommendations_text = prediction["values"][1]
+            recommendations_list = recommendations_text.split("\n\n")  # Split by double new lines
 
-        # Format each recommendation as a separate response
-        responses = []
-        for item in recommendations_list:
-            # Clean up the item by stripping leading/trailing spaces and newlines
-            response = {"text": item.strip()}
-            responses.append(response)
+            # Format each recommendation as a separate response
+            responses = []
+            for item in recommendations_list:
+                # Clean up the item by stripping leading/trailing spaces and newlines
+                response = {"text": item.strip()}
+                responses.append(response)
 
-        # Initialize the list for cleaned recommendations
-        cleaned_recommendations = []
+            # Initialize the list for cleaned recommendations
+            cleaned_recommendations = []
 
-        # Iterate over the responses and extract the recommendation details
-        for item in responses:
-            # Split the single string in 'text' into individual lines by using "\n"
-            details = item['text'].split("\n")
+            # Iterate over the responses and extract the recommendation details
+            for item in responses:
+                # Split the single string in 'text' into individual lines by using "\n"
+                details = item['text'].split("\n")
 
-            if len(details) >= 4 :
+                if len(details) >= 4 :
                     # Extract the recommendation details from the updated format
-                    dish_number = details[0].split('Recommendation ')[1].strip()  # Strip any extra spaces
-                    dish_number = dish_number[0]
-                    dish_name = details[1].split(": ")[1].strip()
-                    restaurant_name = details[2].split(": ")[1].strip()
-                    calories = int(details[3].split(": ")[1].strip())
-                    price = int(details[4].split(": ")[1].strip())  # Assuming budget refers to price
+                        dish_number = details[0].split('Recommendation ')[1].strip()  # Strip any extra spaces
+                        dish_number = dish_number[0]
+                        dish_name = details[1].split(": ")[1].strip()
+                        restaurant_name = details[2].split(": ")[1].strip()
+                        calories = int(details[3].split(": ")[1].strip())
+                        price = int(details[4].split(": ")[1].strip())  # Assuming budget refers to price
                    
                     # Store the cleaned recommendation
-                    recommendation = {
-                        "Recommendation": dish_number,
-                        "DishName": dish_name,
-                        "RestaurantName": restaurant_name,
-                        "Calories": calories,
-                        "Price": price
+                        recommendation = {
+                            "Recommendation": dish_number,
+                            "DishName": dish_name,
+                            "RestaurantName": restaurant_name,
+                            "Calories": calories,
+                            "Price": price
                     }
                     # Append the cleaned recommendation to the list
                     cleaned_recommendations.append(recommendation)
                 
-        cleaned_recommendations = {"Recommendations": cleaned_recommendations}
-                
-
-                # Return the cleaned list of recommendations
-                # return jsonify(cleaned_recommendations), 200
+        cleaned_recommendations= {"Recommendations": cleaned_recommendations}
         return jsonify(cleaned_recommendations), 200
 
         # Return the response as JSON
