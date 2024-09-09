@@ -175,7 +175,7 @@ def matching():
         # Get the IBM Cloud OAuth token
         mltoken = get_ibm_token()
         # Construct the prompt
-        prompt = f"Find the best match for the restaurant '{restaurant}' and meal '{meal}'."
+        prompt = f"only based the document please Find the best dish match for this Dish'{meal}' from this Restaurant '{restaurant}'  ."
         # Prepare the messages payload
         messages1 = [{"role": "user", "content": prompt}]
         # Prepare the header
