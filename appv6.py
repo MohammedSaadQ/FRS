@@ -191,10 +191,10 @@ def matching():
         }
         # Make the request to the Watson ML model deployment
         response_scoring = requests.post(
-            'https://us-south.ml.cloud.ibm.com/ml/v4/deployments/af66b1fa-ad2b-489d-b127-f33556fce10b/predictions?version=2021-05-01',
-            json=payload_scoring,
-            headers=header
-        )
+        'https://us-south.ml.cloud.ibm.com/ml/v4/deployments/af66b1fa-ad2b-489d-b127-f33556fce10b/predictions?version=2021-05-01',
+        json=payload_scoring,
+        headers=header
+    )
         # Parse the response
         answer = response_scoring.json()["predictions"][0]["values"][1]
         # Return the response as JSON
