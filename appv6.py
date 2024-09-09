@@ -83,10 +83,11 @@ def recommendation():
         params = request.json
         customer_id = params.get("id")
         loc = params.get("location")
+        pref = params.get("preference")
         # Get the IBM Cloud OAuth token
         mltoken = get_ibm_token()
         # Construct the question
-        question = f"recommend 3 dishes for customer with ID = {customer_id} that share the same location as the customer ({loc}) and do not recommend dishes that share ingredients with the customer's dislikes and allergies. recommend dishes that share ingredients with the customer's preferences. recommend dishes whose calories do not exceed the customer's calorie limit. recommend dishes whose price is less than or equal to the customer's budget. only respond with the dish id and name and restaurant name and calories of dish and price of dish"
+        question = f"recommend 3 dishes for customer with ID = {customer_id} that share the same location as the customer ({loc}) and do not recommend dishes that share ingredients with the customer's dislikes and allergies. recommend dishes that share ingredients with the customer's preferences . recommend dishes whose calories do not exceed the customer's calorie limit. recommend dishes whose price is less than or equal to the customer's budget. only respond with the dish id and name and restaurant name and calories of dish and price of dish. Please note customer {customer_id} prefers {pref}. make well-rounded suggestions."
         # Prepare the messages payload
         messages = [{"role": "user", "content": question}]
         # Prepare the header
@@ -102,7 +103,7 @@ def recommendation():
         }
         # Make the request to the Watson ML model deployment
         response_scoring = requests.post(
-            'https://us-south.ml.cloud.ibm.com/ml/v4/deployments/596b54cb-e804-4b0e-9801-5ceea719b5d6/predictions?version=2021-05-01',
+            'https://us-south.ml.cloud.ibm.com/ml/v4/deployments/af66b1fa-ad2b-489d-b127-f33556fce10b/predictions?version=2021-05-01',
             json=payload_scoring,
             headers=header
         )
@@ -110,40 +111,58 @@ def recommendation():
         response_json = response_scoring.json()
         if "predictions" in response_json and len(response_json["predictions"]) > 0:
             prediction = response_json["predictions"][0]
-            
-            # Check if "values" contain valid data
-            if "values" in prediction and len(prediction["values"]) > 1:
-                recommendations_text = prediction["values"][1]
-                recommendations_list = recommendations_text.split("\n\n")[1:]  # Split by double new lines
-                # Format each recommendation as a separate response
-                responses = []
-                for item in recommendations_list:
-                    response = {"text": item.strip()}
-                    responses.append(response)
-                # Initialize the list for cleaned recommendations
-                cleaned_recommendations = []
-                # Iterate over the responses and extract the recommendation details
-                for item in responses:
+
+    # Check if "values" contain valid data
+        if "values" in prediction and len(prediction["values"]) > 1:
+            recommendations_text = prediction["values"][1]
+            recommendations_list = recommendations_text.split("\n\n")  # Split by double new lines
+
+        # Format each recommendation as a separate response
+        responses = []
+        for item in recommendations_list:
+            # Clean up the item by stripping leading/trailing spaces and newlines
+            response = {"text": item.strip()}
+            responses.append(response)
+
+        # Initialize the list for cleaned recommendations
+        cleaned_recommendations = []
+
+        # Iterate over the responses and extract the recommendation details
+        for item in responses:
+            details = item['text'].replace("**", "").replace("\n* ", ", ").split(', ')
+
+            # Check if the first item contains the "Dish" information
+            if details[0].startswith("Dish"):
+                try:
                     # Extract the recommendation details
-                    details = item['text'].replace("### Recommendation ", "").replace("\n* ", ", ").split(', ')
-                    # Ensure all necessary details are present
-                    if len(details) >= 6:
-                        recommendation = {
-                            "Recommendation": int(details[0]),
-                            "Dish ID": int(details[1].split(": ")[1]),
-                            "Dish Name": details[2].split(": ")[1],
-                            "Restaurant Name": details[3].split(": ")[1],
-                            "Calories": int(details[4].split(": ")[1]),
-                            "Price": int(details[5].split(": ")[1])
-                        }
+                    dish_number = details[0].split('Dish ')[1]  # Safe split operation
+                    dish_id = int(details[1].split(": ")[1])
+                    dish_name = details[2].split(": ")[1]
+                    restaurant_name = details[3].split(": ")[1]
+                    calories = int(details[4].split(": ")[1])
+                    price = int(details[5].split(": ")[1])
 
-                        # Append the recommendation to the list
-                        cleaned_recommendations.append(recommendation)
+                    recommendation = {
+                        "Recommendation": int(dish_number),
+                        "Dish ID": dish_id,
+                        "Dish Name": dish_name,
+                        "Restaurant Name": restaurant_name,
+                        "Calories": calories,
+                        "Price": price
+                    }
 
-                cleaned_recommendations = {"Recommendations" : cleaned_recommendations}
+                    # Append the cleaned recommendation to the list
+                    cleaned_recommendations.append(recommendation)
+                except IndexError:
+                    # Handle cases where data is incomplete or the format is unexpected
+                    continue
+
+
+        # Return the cleaned list of recommendations
+        cleaned_recommendations = {"Recommendations": cleaned_recommendations}
                 # Return the cleaned list of recommendations
                 # return jsonify(cleaned_recommendations), 200
-                return jsonify(cleaned_recommendations), 200
+        return jsonify(cleaned_recommendations), 200
 
         # Return the response as JSON
         #return jsonify(answer), 200
@@ -177,7 +196,7 @@ def matching():
         }
         # Make the request to the Watson ML model deployment
         response_scoring = requests.post(
-            'https://us-south.ml.cloud.ibm.com/ml/v4/deployments/596b54cb-e804-4b0e-9801-5ceea719b5d6/predictions?version=2021-05-01',
+            'https://us-south.ml.cloud.ibm.com/ml/v4/deployments/af66b1fa-ad2b-489d-b127-f33556fce10b/predictions?version=2021-05-01',
             json=payload_scoring,
             headers=header
         )
