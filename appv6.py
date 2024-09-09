@@ -87,7 +87,7 @@ def recommendation():
         # Get the IBM Cloud OAuth token
         mltoken = get_ibm_token()
         # Construct the question
-        question = f"recommend 3 dishes for customer with ID = {customer_id} that share the same location as the customer ({loc}) and do not recommend dishes that share ingredients with the customer's dislikes and allergies. recommend dishes that share ingredients with the customer's preferences . recommend dishes whose calories do not exceed the customer's calorie limit. recommend dishes whose price is less than or equal to the customer's budget. only respond with the dish id and name and restaurant name and calories of dish and price of dish. Please note customer {customer_id} prefers {pref}. make well-rounded suggestions."
+        question = f"recommend 3 dishes for customer with ID = {customer_id} that share the same location as the customer ({loc}) and do not recommend dishes that share ingredients with the customer's dislikes and allergies. recommend dishes that share ingredients with the customer's preferences. recommend dishes whose calories do not exceed the customer's calorie limit. recommend dishes whose price is less than or equal to the customer's budget. Please note customer {customer_id} prefers {pref}. make well-rounded suggestions. only respond with the Recommendation number, dish name and restaurant name and calories for the dish and the budget for the dish."
         # Prepare the messages payload
         messages = [{"role": "user", "content": question}]
         # Prepare the header
@@ -109,13 +109,13 @@ def recommendation():
         )
         # Parse the response
         response_json = response_scoring.json()
-        if "predictions" in response_json and len(response_json["predictions"]) > 0:
-            prediction = response_json["predictions"][0]
+    if "predictions" in response_json and len(response_json["predictions"]) > 0:
+        prediction = response_json["predictions"][0]
 
     # Check if "values" contain valid data
-        if "values" in prediction and len(prediction["values"]) > 1:
-            recommendations_text = prediction["values"][1]
-            recommendations_list = recommendations_text.split("\n\n")  # Split by double new lines
+    if "values" in prediction and len(prediction["values"]) > 1:
+        recommendations_text = prediction["values"][1]
+        recommendations_list = recommendations_text.split("\n\n")  # Split by double new lines
 
         # Format each recommendation as a separate response
         responses = []
@@ -129,37 +129,32 @@ def recommendation():
 
         # Iterate over the responses and extract the recommendation details
         for item in responses:
-            details = item['text'].replace("**", "").replace("\n* ", ", ").split(', ')
+            # Split the single string in 'text' into individual lines by using "\n"
+            details = item['text'].split("\n")
 
-            # Check if the first item contains the "Dish" information
-            if details[0].startswith("Dish"):
-                try:
-                    # Extract the recommendation details
-                    dish_number = details[0].split('Dish ')[1]  # Safe split operation
-                    dish_id = int(details[1].split(": ")[1])
-                    dish_name = details[2].split(": ")[1]
-                    restaurant_name = details[3].split(": ")[1]
-                    calories = int(details[4].split(": ")[1])
-                    price = int(details[5].split(": ")[1])
-
+            if len(details) >= 4 :
+                    # Extract the recommendation details from the updated format
+                    dish_number = details[0].split('Recommendation ')[1].strip()  # Strip any extra spaces
+                    dish_number = dish_number[0]
+                    dish_name = details[1].split(": ")[1].strip()
+                    restaurant_name = details[2].split(": ")[1].strip()
+                    calories = int(details[3].split(": ")[1].strip())
+                    price = int(details[4].split(": ")[1].strip())  # Assuming budget refers to price
+                   
+                    # Store the cleaned recommendation
                     recommendation = {
-                        "Recommendation": int(dish_number),
-                        "DishID": dish_id,
+                        "Recommendation": dish_number,
                         "DishName": dish_name,
                         "RestaurantName": restaurant_name,
                         "Calories": calories,
                         "Price": price
                     }
-
                     # Append the cleaned recommendation to the list
                     cleaned_recommendations.append(recommendation)
-                except IndexError:
-                    # Handle cases where data is incomplete or the format is unexpected
-                    continue
-
-
-        # Return the cleaned list of recommendations
+                
         cleaned_recommendations = {"Recommendations": cleaned_recommendations}
+                
+
                 # Return the cleaned list of recommendations
                 # return jsonify(cleaned_recommendations), 200
         return jsonify(cleaned_recommendations), 200
