@@ -40,10 +40,10 @@ def set_variables_from_data(customer_data):
 @app.route('/get_customer_data', methods=['POST'])
 def get_customer_data():
     params = request.json
-    Num = params.get("Phone_Num")
+    Num = params.get("PhNum")
     
-    logger.debug(f"Received request with customer ID: {customer_id}")
-    if customer_id is None:
+    logger.debug(f"Received request with customer ID: {Num}")
+    if Num is None:
         logger.error("No customer ID provided.")
         return jsonify({"error": "No customer ID provided."}), 400
     try:
