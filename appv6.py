@@ -93,7 +93,9 @@ def recommendation():
     loc = str(params.get("location"))
     pref = str(params.get("prefernces"))
     customer_id =str(customer_id)
-    return jsonify({customer_id,pref,loc}),200
+    print(customer_id)
+    print(params.get("id"))
+    print(pref)
     # Get the IBM Cloud OAuth token
     mltoken = get_ibm_token()
     
