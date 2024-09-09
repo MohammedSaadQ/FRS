@@ -144,9 +144,9 @@ def recommendation():
 
                     recommendation = {
                         "Recommendation": int(dish_number),
-                        "Dish ID": dish_id,
-                        "Dish Name": dish_name,
-                        "Restaurant Name": restaurant_name,
+                        "DishID": dish_id,
+                        "DishName": dish_name,
+                        "RestaurantName": restaurant_name,
                         "Calories": calories,
                         "Price": price
                     }
