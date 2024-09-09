@@ -26,7 +26,7 @@ def set_variables_from_data(customer_data):
             "allergy": str(customer_data.get("allergy", "")),
             "budget": str(customer_data.get("budget", "")),
             "calories": str(customer_data.get("calories", "")),
-            "customerid": str(customer_data.get("customerid", "")),
+            "customerid": str(customer_data.get("customer_id", "")),  # Updated key based on the response
             "dislikes": str(customer_data.get("dislikes", "")),
             "first_name": str(customer_data.get("first_name", "")),
             "last_name": str(customer_data.get("last_name", "")),
@@ -34,29 +34,34 @@ def set_variables_from_data(customer_data):
             "preferences": str(customer_data.get("preferences", ""))
         }
     else:
-        logger.error("Data is not in the expected format.")
         return None
+
 # Define the API endpoint
 @app.route('/get_customer_data', methods=['POST'])
 def get_customer_data():
     params = request.json
     Num = params.get("PhNum")
     
-    logger.debug(f"Received request with customer ID: {Num}")
     if Num is None:
-        logger.error("No customer ID provided.")
-        return jsonify({"error": "No customer ID provided."}), 400
+        return jsonify({"error": "No customer Phone_Num provided."}), 400
+    
     try:
         api_url = f"https://mysara210.pythonanywhere.com/get_customer?Phone_Num={Num}"
-        logger.debug(f"Making API request to: {api_url}")
-        response = requests.get(api_url)
+        response = requests.get(api_url)  # Adding a timeout for the request
+        
         if response.status_code == 200:
             try:
-                customer_data = response.json()  # Assume this returns a dictionary
-                logger.debug(f"Received customer data: {customer_data}")
+                customer_data = response.json()  # This should return a list based on the example response
+                
+                # Check if it's a list and extract the first element
+                if isinstance(customer_data, list) and len(customer_data) > 0:
+                    customer_data = customer_data[0]  # Extract the first element from the list
+
             except ValueError:
-                logger.error("Failed to parse the JSON response from the external API.")
                 return jsonify({"error": "Failed to parse the JSON response from the external API."}), 500
+            except Exception as e:  # Catch any other exception during JSON parsing
+                return jsonify({"error": f"Unexpected error: {str(e)}"}), 500
+
             if isinstance(customer_data, dict):
                 response_data = set_variables_from_data(customer_data)
                 if response_data is None:
@@ -65,14 +70,14 @@ def get_customer_data():
                 # Return the dictionary as JSON
                 return jsonify(response_data), 200
             else:
-                logger.error("Unexpected data format received from the external API.")
                 return jsonify({"error": "Unexpected data format received from the external API."}), 500
         else:
-            logger.error(f"Failed to fetch customer data. Status code: {response.status_code}")
             return jsonify({"error": f"Failed to fetch customer data. Status code: {response.status_code}"}), response.status_code
-    except Exception as e:
-        logger.error(f"An error occurred during the API request: {str(e)}")
+    except requests.exceptions.RequestException as e:
         return jsonify({"error": f"An error occurred: {str(e)}"}), 500
+    except Exception as e:
+        return jsonify({"error": f"An unexpected error occurred: {str(e)}"}), 500
+
 def get_ibm_token():
     API_KEY = "tAqvF4CdCAl9Ly4TrNECn-p1t_KyCHqbrYa_XXUQldul"
     token_response = requests.post(
