@@ -90,8 +90,8 @@ def get_ibm_token():
 def recommendation():
     params = request.json
     customer_id = params.get("id")
-    loc = params.get("location")
-    pref = params.get("prefernces")
+    loc = str(params.get("location"))
+    pref = str(params.get("prefernces"))
     customer_id =str(customer_id)
     
     # Get the IBM Cloud OAuth token
