@@ -22,11 +22,14 @@ def set_variables_from_data(customer_data):
     if isinstance(customer_data, dict):
         return {
             "Ingredients": str(customer_data.get("Ingredients", "")),
+            "Phone_Num": str(customer_data.get("Phone_Num", "")),
             "allergy": str(customer_data.get("allergy", "")),
             "budget": str(customer_data.get("budget", "")),
             "calories": str(customer_data.get("calories", "")),
             "customerid": str(customer_data.get("customerid", "")),
             "dislikes": str(customer_data.get("dislikes", "")),
+            "first_name": str(customer_data.get("first_name", "")),
+            "last_name": str(customer_data.get("last_name", "")),
             "location": str(customer_data.get("location", "")),
             "preferences": str(customer_data.get("preferences", ""))
         }
@@ -37,13 +40,14 @@ def set_variables_from_data(customer_data):
 @app.route('/get_customer_data', methods=['POST'])
 def get_customer_data():
     params = request.json
-    customer_id = params.get("id")
+    Num = params.get("Phone_Num")
+    
     logger.debug(f"Received request with customer ID: {customer_id}")
     if customer_id is None:
         logger.error("No customer ID provided.")
         return jsonify({"error": "No customer ID provided."}), 400
     try:
-        api_url = f"https://mysara210.pythonanywhere.com/get_customer?id={customer_id}"
+        api_url = f"https://mysara210.pythonanywhere.com/get_customer?Phone_Num={Num}"
         logger.debug(f"Making API request to: {api_url}")
         response = requests.get(api_url)
         if response.status_code == 200:
@@ -175,7 +179,7 @@ def matching():
         # Get the IBM Cloud OAuth token
         mltoken = get_ibm_token()
         # Construct the prompt
-        prompt = f"only based the document please Find the best dish match for this Dish'{meal}' from this Restaurant '{restaurant}'  ."
+        prompt = f"only based the document please Find the dish that matches '{meal}' from '{restaurant}' and don't mind any typos  ."
         # Prepare the messages payload
         messages1 = [{"role": "user", "content": prompt}]
         # Prepare the header
